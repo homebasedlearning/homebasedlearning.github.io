@@ -37,11 +37,9 @@ https://github.com/Team-Code/KA_Offline -->
      with (processingInstance) {
         size(400, 400); 
         frameRate(30);
-        
-        /*This game and levels were edited using Jacob's Platformer Engine Pro (V1.0)
-https://www.khanacademy.org/computer-programming/platformer-engine-pro-version-10/5991819078533120
-*/
+
 /*
+This game used Jacob's "Game Template" as a base and starting point
 Huge thanks to Jacob for his "Game Template" found here:
 https://www.khanacademy.org/computer-programming/game-template/4920704444923904
 */
@@ -53,8 +51,8 @@ var playerColor = color(255,0,0);
 var grid = 30;
 
 
-/*These levels were edited using Jacob's Platformer Engine Pro (V1.0)
-https://www.khanacademy.org/computer-programming/platformer-engine-pro-version-10/5991819078533120
+/* 
+Btw Jacob's less strict on credits so it's fine to take away this line as there is already the same credits above
 */
 /***********vvv ADD YOUR LEVELS HERE vvv***********/
 var levels = [
@@ -948,9 +946,9 @@ var draw = function() {
         if(portals[0].complete){
             if(level<levels.length-1){level++; updateMap(); resetCam();}else{
                 background(0, 0, 0);fill(255); textSize(20); transparence = 0;
-                text("CONGRATULATIONS\nYou have finished all the levels\nin this game!\n\n Huge thanks to Jacob for\n designing \"game template\",\n which can be found here:",200,200);}
+                text("CONGRATULATIONS\nYou have finished all the levels\nin this game!\n\n Credits in code",200,200);}
                 textSize(9);
-                text("https://www.khanacademy.org/computer-programming/game-template/4920704444923904\n btw i added more blocks and stuff (using pjs)", 200, 343);
+                ;
         }
     }
     

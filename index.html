@@ -215,7 +215,7 @@ var levels = [
 "            b      ",
 "                   ",
 "         g         ",
-"  sb b b###########",
+"  sbdbdb###########",
 " Pd################",
 "bbbbbbbbbbbbbbbbbbbb",
 
@@ -561,7 +561,7 @@ var Block = function(x,y,w,h,type,i){
         }
         if (this.type === "gravity") {
             if (player.x <= this.x + this.w && player.x >= this.x - (this.w / 2) && player.y <= this.y && (player.y + playerSize[1]) >= this.y) {
-                player.gravity = 0.5;
+                player.gravity = 0.56;
             }    
         }
         if (this.type === "normal-grav") {

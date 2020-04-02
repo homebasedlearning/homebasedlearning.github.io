@@ -38,6 +38,7 @@ https://github.com/Team-Code/KA_Offline -->
         size(400, 400); 
         frameRate(30);
 
+
 /*
 This game used Jacob's "Game Template" as a base and starting point
 Huge thanks to Jacob for his "Game Template" found here:
@@ -198,7 +199,46 @@ var levels = [
 "bbbbbbbbbbbbbbbbbbbb",
 
 ],
+[
+"          b        ",
+" oooooooo b        ",
+"       b  b        ",
+"       b bb        ",
+"mmmmdm b  b        ",
+"       bb b        ",
+"       b  b        ",
+" odoooob bb        ",
+"       b    b      ",
+"      @b           ",
+"mmmmmdob n         ",
+"            b      ",
+"                   ",
+"         g         ",
+"  sb b b###########",
+" Pd################",
+"bbbbbbbbbbbbbbbbbbbb",
 
+],
+[
+"                   ",
+"                   ",
+"                   ",
+"                   ",
+"                   ",
+"                   ",
+"                   ",
+"                   ",
+"                   ",
+"                   ",
+"                   ",
+"                   ",
+"                   ",
+"                   ",
+"              Pd   ",
+"    @         bm   ",
+"mmmmmmmmmmmmmbbbbmd",
+
+],
     
     ];
 /******* vvv DON'T TOUCH THOSE! vvv ******/
@@ -355,7 +395,7 @@ var Player = function(x,y,w,h){
     noFill();
     stroke(0);
     strokeWeight(1);
-    
+    arc(d+this.x+this.w/2,this.y,this.w,this.h*1.5,70,110);
     };
     this.applyCollision=function(obj,velx,vely){
     for(var i=0; i<obj.length; i++){
@@ -426,6 +466,15 @@ var Block = function(x,y,w,h,type,i){
                 case "jumpy":
                     noStroke(); fill(68, 255, 51);
                     rect(this.x, this.y, this.w, this.h);
+                break;
+                case "gravity":
+                    noStroke(); fill(255, 119, 0);
+                    rect(this.x, this.y, this.w, this.h);
+                break;
+                case "normal-grav":
+                    noStroke(); fill(0, 60, 255);
+                    rect(this.x, this.y, this.w, this.h);
+                break;
             }
         }
     };
@@ -489,8 +538,16 @@ var Block = function(x,y,w,h,type,i){
                 player.gravity = 0.15;
             }    
         }
-        
-    
+        if (this.type === "gravity") {
+            if (player.x <= this.x + this.w && player.x >= this.x - (this.w / 2) && player.y <= this.y && (player.y + playerSize[1]) >= this.y) {
+                player.gravity = 0.5;
+            }    
+        }
+        if (this.type === "normal-grav") {
+            if (player.x <= this.x + this.w && player.x >= this.x - (this.w / 2) && player.y <= this.y && (player.y + playerSize[1]) >= this.y) {
+                player.gravity = 0.3;
+            }    
+        }
         
         
     };
@@ -873,7 +930,10 @@ var updateMap = function(){
                     break;
                 case "j": blocks.add(row * grid, col * grid, grid, grid, "jumpy");
                     break;
-                    
+                case "g": blocks.add(row * grid, col * grid, grid, grid, "gravity");
+                    break; 
+                case "n": blocks.add(row * grid, col * grid, grid, grid, "normal-grav");
+                    break; 
             }
             level_w = levels[level][col].length * grid;
             level_h = levels[level].length * grid;
@@ -938,6 +998,14 @@ var draw = function() {
         fill(13, 97, 4);
         text("Green jump boost blocks \nsimulate \nmoon gravity", 152, 200);
     }
+    if (level === 7) {
+        fill(0, 0, 0);
+        text("More gravity\n blocks added", 188, 372);
+    }
+    if (level === 8) {
+        fill(0, 0, 0);
+        text("Free level!!!", 470, 372);
+    }
     applyGame();
     popMatrix();
     player.healthBar();
@@ -966,6 +1034,8 @@ redTrans = constrain(redTrans,0,255);
 }
 //background(255);
 };
+
+
 
 
 

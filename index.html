@@ -1138,7 +1138,10 @@ var draw = function() {
         fill(0, 0, 0);
         text("Yay! \nI made \nmoving cannons!", 136, 248);
     }
-    
+    if (level === 10) {
+        fill(0, 0, 0);
+        text("Fake blocks are involved...", 258, 131);
+    }
     applyGame();
     popMatrix();
     player.healthBar();

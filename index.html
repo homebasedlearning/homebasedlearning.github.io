@@ -40,6 +40,7 @@ https://github.com/Team-Code/KA_Offline -->
 
 
 
+
 /*
 This game used Jacob's "Game Template" as a base and starting point
 Huge thanks to Jacob for his "Game Template" found here:
@@ -73,7 +74,7 @@ var levels = [
 "           b                 ",
 "           b         b       ",
 "           b         b       ",
-"   #    A  b         bbAb    ",
+"   #    A  b         bbbb    ",
 "                     b### b  ",
 "            _ _ _ _  b###    ",
 " P          ########Mb###@b  ",
@@ -141,7 +142,7 @@ var levels = [
 
 ],
 [
-"             #bdddd",
+"             #b    ",
 "  bb##b##b   #b    ",
 "Pd  bb bb b  #b    ",
 "b   ###    b #b    ",
@@ -181,15 +182,15 @@ var levels = [
 
 ],
 [
-"                    ",
-"          s         ",
-"          b         ",
-"          b         ",
-"          b         ",
-"          b         ",
-"          b dddddddd",
-"        jbb         ",
-"       M  b         ",
+"                   ",
+"          s        ",
+"          b        ",
+"          b        ",
+"          b        ",
+"          b        ",
+"          b ddddddd",
+"        jbb        ",
+"       M  b        ",
 "          b _ _ _ _s",
 "      M   b ########",
 "    _    Mb ########",
@@ -252,12 +253,32 @@ var levels = [
 "#       dM#        ",
 "#       dM#        ",
 "#bc c cbdM#        ",
-"#        M#@      #",
+"#        M#@       ",
 "#  _ _ _ Mbbmmmmmmm",
 "b b######M         ",
 "b b######M         ",
-"#Pd######M         ",
+" Pd######M         ",
 "bbbbbbbbbbbbbbbbbbb",
+
+],
+[
+"                    ",
+"bbbb                ",
+"    bbbbbbbbbbbbbbbb",
+"b  & & & & & & & & b",
+" P#                 ",
+"bbbbbbfbbbbbfbbbbb ",
+"dddddddddddddddddd ",
+"                    ",
+"ffffffffffffffffffbb",
+"ddd dddddddddddddddd",
+"                    ",
+" mmmmmffffbfoooooooo",
+" bcdcddcb           ",
+"        b           ",
+"                   @",
+"bbbbbbbbb   f   bmfb",
+"dddddddddddddddddddd",
 
 ],
     
@@ -422,6 +443,7 @@ var Player = function(x,y,w,h){
     for(var i=0; i<obj.length; i++){
         if(collide(this,obj[i])&&obj[i].solid){ // handle collisions
             if(obj[i].type==="ice"){obj[i].melting = true;}//make the ice blocks start melting
+            if(obj[i].type==="fakeBlk"){obj[i].melting = true;}
             if(vely>0){ this.yvel=0; this.falling=false; this.y=obj[i].y-this.h; }
             if(vely<0){ this.yvel=0; this.falling=true; this.y=obj[i].y+obj[i].h; }
             if(velx<0){ this.xvel=0; this.x=obj[i].x+obj[i].w; }
@@ -451,10 +473,12 @@ var Block = function(x,y,w,h,type,i){
     this.fast = false; this.idk = 255;
     this.oppFast = false;
     this.slow = false;
+    this.r = 163; this.g = 163; this.b = 163;
     this.draw = function() {
         if(view(this)){
             switch(this.type){
                 case "moving":
+                    noStroke();
                     fill(77, 77, 77);
                     rect(this.x, this.y, this.w, this.h);
                     fill(163, 163, 163);
@@ -464,6 +488,7 @@ var Block = function(x,y,w,h,type,i){
                     popMatrix();
                 break;
                 case "op-moving":
+                    noStroke();
                     fill(77, 77, 77);
                     rect(this.x, this.y, this.w, this.h);
                     fill(163, 163, 163);
@@ -494,6 +519,10 @@ var Block = function(x,y,w,h,type,i){
                 break;
                 case "normal-grav":
                     noStroke(); fill(0, 60, 255);
+                    rect(this.x, this.y, this.w, this.h);
+                break;
+                case "fakeBlk":
+                    noStroke(); fill(this.r, this.g, this.b, this.op);
                     rect(this.x, this.y, this.w, this.h);
                 break;
             }
@@ -568,6 +597,22 @@ var Block = function(x,y,w,h,type,i){
             if (player.x <= this.x + this.w && player.x >= this.x - (this.w / 2) && player.y <= this.y && (player.y + playerSize[1]) >= this.y) {
                 player.gravity = 0.3;
             }    
+        }
+        if(this.type==="fakeBlk"){
+            if(this.melting){
+                this.r = 255; this.g = 0; this.b = 0;
+                this.op-=20;
+            }
+            if(this.op<50){
+                this.solid = false;
+            }
+            if(this.op<-2000){
+                this.op=255;
+                this.melting = false;
+                this.solid = true;
+                this.r = 163; this.g = 163; this.b = 163;
+            }
+            
         }
         
         
@@ -1011,6 +1056,9 @@ var updateMap = function(){
                     break; 
                 case "c": moveCannons.add(row*grid,col*grid,grid);
                     break;
+                case "G": GhostBlock.add(row * grid, col * grid, grid);
+                    break;
+                case "f": blocks.add(row * grid, col * grid, grid, grid, "fakeBlk");
             }
             level_w = levels[level][col].length * grid;
             level_h = levels[level].length * grid;
@@ -1034,6 +1082,7 @@ var applyGame = function(){
     cannons.apply();
     DeathBlock.apply();
     moveCannons.apply();
+    GhostBlock.apply();
     player.update(blocks);
     
     
@@ -1088,7 +1137,6 @@ var draw = function() {
     if (level === 9) {
         fill(0, 0, 0);
         text("Yay! \nI made \nmoving cannons!", 136, 248);
-	text("You can also \njump on them \nto kill them!", 136, 120);
     }
     
     applyGame();
@@ -1118,7 +1166,11 @@ transparence=constrain(transparence,0,255);
 redTrans = constrain(redTrans,0,255);
 }
 //background(255);
+
 };
+
+
+
 
 
 

@@ -39,6 +39,7 @@ https://github.com/Team-Code/KA_Offline -->
         frameRate(60);
 
 
+
 /*
 This game used Jacob's "Game Template" as a base and starting point
 Huge thanks to Jacob for his "Game Template" found here:
@@ -140,7 +141,7 @@ var levels = [
 
 ],
 [
-"             #bdddd",
+"             #b    ",
 "  bb##b##b   #b    ",
 "Pd  bb bb b  #b    ",
 "b   ###    b #b    ",
@@ -237,6 +238,26 @@ var levels = [
 "              Pd   ",
 "    @         mm   ",
 "mmmmmmmmmmmmmbbbmmd",
+
+],
+[
+"#                  ",
+"#                  ",
+"#       d#         ",
+"#       dbbbbbbbbbbb",
+"#       dM         ",
+"#       dMbb#b#bb  b",
+"#       dM  b b    ",
+"#       dM#        ",
+"#       dM#        ",
+"#       dM#        ",
+"#bc c cbdM#        ",
+"#        M#@       ",
+"#  _ _ _ Mbbmmmmmmm",
+"b b######M         ",
+"b b######M         ",
+" Pd######M         ",
+"bbbbbbbbbbbbbbbbbbb",
 
 ],
     
@@ -885,9 +906,63 @@ monsters.apply=function(){
         if(this[i].dead){this.splice(i,1);}
     }
 };
+var moveCannon = function(x,y,w,h){
+    this.x=x; this.y=y; this.w=w; this.h=h;
+    this.angle = atan2(this.x-player.x,player.y-this.y);
+    this.bullets = []; this.dead = false;
+    this.xvel = 1;
+    this.draw = function() {
+        if(view(this)){
+        noStroke();
+        fill(80);
+        ellipse(this.x+this.w/2,this.y+this.h/2,this.w*3/5,this.h*3/5);
+        pushMatrix();
+        translate(this.x+this.w/2,this.y+this.h/2);
+        rotate(this.angle);
+        rect(-5,5,this.w/3,10);
+        popMatrix();
+        }
+        
+    };
+    this.update = function(){
+        this.angle = atan2(this.x-player.x,player.y-this.y);
+        if((frameCount%100)===99){
+            bullets.add(this.x+this.w/2,this.y+this.h/2,this.angle+90);
+        }
+        if (!this.dead) {
+            this.x += this.xvel;
+            
+            for(var i=0;i<blocks.length;i++){
+                if(collide(this, blocks[i])){
+                    this.xvel=-this.xvel;
+                }
+            }
+            if(collide(this, player)){
+                if(!player.falling&&!this.dead&&!player.dead){
+                        player.health-=5;
+                        redTrans = 80;
+                }else if(player.yvel>0&&player.falling){
+                        this.dead=true; // the monster is "dead"
+                        player.yvel=-player.JH; // make the player hop 
+                        
+                }
+            }
+        }
+    };
+    
+};
+var moveCannons = [];
+moveCannons.add = function(x,y,s){this.push( new moveCannon(x,y,s,s));};
+moveCannons.apply = function(){
+    for(var i=0;i<this.length;i++){
+        this[i].draw();
+        this[i].update();
+        if(this[i].dead){this.splice(i,1);}
+    }
+};
     
 //manage the objects in the game
-var objects = [blocks,portals,lava,spikes,jumpBlocks,cannons,bullets, monsters, DeathBlock, GhostBlock];
+var objects = [blocks,portals,lava,spikes,jumpBlocks,cannons,bullets, monsters, DeathBlock, GhostBlock, moveCannons];
 objects.remove = function(){
     for (var i = 0; i < objects.length; i++) {
         for (var j = 0; j < objects[i].length; j++) {
@@ -934,6 +1009,8 @@ var updateMap = function(){
                     break; 
                 case "n": blocks.add(row * grid, col * grid, grid, grid, "normal-grav");
                     break; 
+                case "c": moveCannons.add(row*grid,col*grid,grid);
+                    break;
             }
             level_w = levels[level][col].length * grid;
             level_h = levels[level].length * grid;
@@ -956,7 +1033,9 @@ var applyGame = function(){
     bullets.apply();
     cannons.apply();
     DeathBlock.apply();
+    moveCannons.apply();
     player.update(blocks);
+    
     
 };
     
@@ -1006,6 +1085,11 @@ var draw = function() {
         fill(0, 0, 0);
         text("Free level!!!", 470, 372);
     }
+    if (level === 9) {
+        fill(0, 0, 0);
+        text("Yay! \nI made \nmoving cannons!", 136, 248);
+    }
+    
     applyGame();
     popMatrix();
     player.healthBar();
@@ -1034,6 +1118,9 @@ redTrans = constrain(redTrans,0,255);
 }
 //background(255);
 };
+
+
+
 
 
 

@@ -41,6 +41,7 @@ https://github.com/Team-Code/KA_Offline -->
 
 
 
+
 /*
 This game used Jacob's "Game Template" as a base and starting point
 Huge thanks to Jacob for his "Game Template" found here:
@@ -279,6 +280,26 @@ var levels = [
 "                   @",
 "bbbbbbbbb   f   bmfb",
 "dddddddddddddddddddd",
+
+],
+[
+"                   ",
+"                   ",
+"                   ",
+"                   ",
+"                   ",
+"                   ",
+"          b3b      ",
+"  b       b b      ",
+"  b       b b      ",
+"  b       b b      ",
+"  b       b bbbbbbbb",
+"  b       bccccccccb",
+"  b       b        ",
+"  b       bM       ",
+"  b       bbbbbbbbbj",
+"@ bP#M  I bO       2",
+"bbbbbbbbbbbsbdbdbdbb",
 
 ],
     
@@ -628,6 +649,114 @@ blocks.apply = function(){
     }
 };
 
+
+var TeleporterIn = function(x, y, w, h) {
+    this.x = x; this.y = y;  this.w = w; this.h = h;
+    this.complete = false; this.isOff = false;
+    this.draw = function() {
+        fill(0, 0, 0);
+        rect(this.x, this.y + grid, this.w, 5);
+        fill(0, 34, 255, 100);
+        quad(this.x, this.y + grid, this.x + this.w, this.y + grid, this.x + this.w + 10, this.y + 10, this.x - 10, this.y + 10);
+    };
+    this.update = function() {
+        if (!collide(this, player)) {
+            this.isOff = true;
+        }
+        if (collide(this, player) && this.isOff === true) {
+            this.complete = true;
+        }    
+    };
+};
+var teleporterIns = [];
+teleporterIns.add = function(x,y,w,h){this.push(new TeleporterIn(x,y,w,h));};
+teleporterIns.apply = function(){
+    for(var i=0;i<this.length;i++){
+        this[i].draw();
+        this[i].update();
+    }
+};
+
+var TeleporterOut = function(x, y, w, h) {
+    this.x = x; this.y = y;  this.w = w; this.h = h;
+    this.complete = false; this.isOff = false;
+    this.draw = function() {
+        fill(0, 0, 0);
+        rect(this.x, this.y + grid, this.w, 5);
+        fill(0, 34, 255, 50);
+        quad(this.x, this.y + grid, this.x + this.w, this.y + grid, this.x + this.w + 10, this.y + 10, this.x - 10, this.y + 10);
+    };
+    this.update = function() {
+        if (!collide(this, player)) {
+            this.isOff = true;
+        }
+        if (collide(this, player) && this.isOff === true) {
+            this.complete = true;
+        }    
+    };
+};
+var teleporterOuts = [];
+teleporterOuts.add = function(x,y,w,h){this.push(new TeleporterOut(x,y,w,h));};
+teleporterOuts.apply = function(){
+    for(var i=0;i<this.length;i++){
+        this[i].draw();
+        this[i].update();
+    }
+};
+
+var TeleporterIn2 = function(x, y, w, h) {
+    this.x = x; this.y = y;  this.w = w; this.h = h;
+    this.complete = false; this.isOff = false;
+    this.draw = function() {
+        fill(0, 0, 0);
+        rect(this.x, this.y + grid, this.w, 5);
+        fill(255, 34, 255, 100);
+        quad(this.x, this.y + grid, this.x + this.w, this.y + grid, this.x + this.w + 10, this.y + 10, this.x - 10, this.y + 10);
+    };
+    this.update = function() {
+        if (!collide(this, player)) {
+            this.isOff = true;
+        }
+        if (collide(this, player) && this.isOff === true) {
+            this.complete = true;
+        }    
+    };
+};
+var teleporterIns2 = [];
+teleporterIns2.add = function(x,y,w,h){this.push(new TeleporterIn2(x,y,w,h));};
+teleporterIns2.apply = function(){
+    for(var i=0;i<this.length;i++){
+        this[i].draw();
+        this[i].update();
+    }
+};
+
+var TeleporterOut2 = function(x, y, w, h) {
+    this.x = x; this.y = y;  this.w = w; this.h = h;
+    this.complete = false; this.isOff = false;
+    this.draw = function() {
+        fill(0, 0, 0);
+        rect(this.x, this.y + grid, this.w, 5);
+        fill(255, 34, 255, 50);
+        quad(this.x, this.y + grid, this.x + this.w, this.y + grid, this.x + this.w + 10, this.y + 10, this.x - 10, this.y + 10);
+    };
+    this.update = function() {
+        if (!collide(this, player)) {
+            this.isOff = true;
+        }
+        if (collide(this, player) && this.isOff === true) {
+            this.complete = true;
+        }    
+    };
+};
+var teleporterOuts2 = [];
+teleporterOuts2.add = function(x,y,w,h){this.push(new TeleporterOut2(x,y,w,h));};
+teleporterOuts2.apply = function(){
+    for(var i=0;i<this.length;i++){
+        this[i].draw();
+        this[i].update();
+    }
+};
 //@portal
 var Goal = function(x,y,radius,i){
     this.x=x; this.y=y; this.w=radius; this.h=radius; this.isImage = i;
@@ -1007,7 +1136,7 @@ moveCannons.apply = function(){
 };
     
 //manage the objects in the game
-var objects = [blocks,portals,lava,spikes,jumpBlocks,cannons,bullets, monsters, DeathBlock, GhostBlock, moveCannons];
+var objects = [blocks,portals,lava,spikes,jumpBlocks,cannons,bullets, monsters, DeathBlock, GhostBlock, moveCannons, teleporterIns, teleporterOuts, teleporterIns2, teleporterOuts2];
 objects.remove = function(){
     for (var i = 0; i < objects.length; i++) {
         for (var j = 0; j < objects[i].length; j++) {
@@ -1059,6 +1188,15 @@ var updateMap = function(){
                 case "G": GhostBlock.add(row * grid, col * grid, grid);
                     break;
                 case "f": blocks.add(row * grid, col * grid, grid, grid, "fakeBlk");
+                    break;
+                case "I": teleporterIns.add(row * grid, col * grid, grid, grid);
+                    break;
+                case "O": teleporterOuts.add(row * grid, col * grid, grid, grid);
+                    break;
+                case "2": teleporterIns2.add(row * grid, col * grid, grid, grid);
+                    break;
+                case "3": teleporterOuts2.add(row * grid, col * grid, grid, grid);
+                    break;
             }
             level_w = levels[level][col].length * grid;
             level_h = levels[level].length * grid;
@@ -1083,6 +1221,10 @@ var applyGame = function(){
     DeathBlock.apply();
     moveCannons.apply();
     GhostBlock.apply();
+    teleporterIns.apply();
+    teleporterOuts.apply();
+    teleporterIns2.apply();
+    teleporterOuts2.apply();
     player.update(blocks);
     
     
@@ -1142,6 +1284,8 @@ var draw = function() {
         fill(0, 0, 0);
         text("Fake blocks are involved...", 258, 131);
     }
+    
+    
     applyGame();
     popMatrix();
     player.healthBar();
@@ -1153,6 +1297,38 @@ var draw = function() {
                 text("CONGRATULATIONS\nYou have finished all the levels\nin this game...\nFor now...\nI will add more lvls, mechanics \nand blocks. Maybe\n\n Credits in code",200,200);}
                 textSize(9);
                 
+        }
+    }
+    if (teleporterIns[0] && teleporterOuts[0]) {
+        if (teleporterIns[0].complete === true) {
+            teleporterIns[0].complete = false;
+            player.x = teleporterOuts[0].x;
+            player.y = teleporterOuts[0].y;
+            
+            teleporterOuts[0].isOff = false;
+        }
+        if (teleporterOuts[0].complete === true) {
+            teleporterOuts[0].complete = false;
+            player.x = teleporterIns[0].x;
+            player.y = teleporterIns[0].y;
+            
+            teleporterIns[0].isOff = false;
+        }
+    }
+    if (teleporterIns2[0] && teleporterOuts2[0]) {
+        if (teleporterIns2[0].complete === true) {
+            teleporterIns2[0].complete = false;
+            player.x = teleporterOuts2[0].x;
+            player.y = teleporterOuts2[0].y;
+            
+            teleporterOuts2[0].isOff = false;
+        }
+        if (teleporterOuts2[0].complete === true) {
+            teleporterOuts2[0].complete = false;
+            player.x = teleporterIns2[0].x;
+            player.y = teleporterIns2[0].y;
+            
+            teleporterIns2[0].isOff = false;
         }
     }
     
@@ -1171,6 +1347,9 @@ redTrans = constrain(redTrans,0,255);
 //background(255);
 
 };
+
+
+
 
 
 

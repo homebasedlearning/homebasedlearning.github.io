@@ -42,6 +42,7 @@ https://github.com/Team-Code/KA_Offline -->
 
 
 
+
 /*
 This game used Jacob's "Game Template" as a base and starting point
 Huge thanks to Jacob for his "Game Template" found here:
@@ -654,6 +655,7 @@ var TeleporterIn = function(x, y, w, h) {
     this.x = x; this.y = y;  this.w = w; this.h = h;
     this.complete = false; this.isOff = false;
     this.draw = function() {
+        noStroke();
         fill(0, 0, 0);
         rect(this.x, this.y + grid, this.w, 5);
         fill(0, 34, 255, 100);
@@ -681,6 +683,7 @@ var TeleporterOut = function(x, y, w, h) {
     this.x = x; this.y = y;  this.w = w; this.h = h;
     this.complete = false; this.isOff = false;
     this.draw = function() {
+        noStroke();
         fill(0, 0, 0);
         rect(this.x, this.y + grid, this.w, 5);
         fill(0, 34, 255, 50);
@@ -708,6 +711,7 @@ var TeleporterIn2 = function(x, y, w, h) {
     this.x = x; this.y = y;  this.w = w; this.h = h;
     this.complete = false; this.isOff = false;
     this.draw = function() {
+        noStroke();
         fill(0, 0, 0);
         rect(this.x, this.y + grid, this.w, 5);
         fill(255, 34, 255, 100);
@@ -735,6 +739,7 @@ var TeleporterOut2 = function(x, y, w, h) {
     this.x = x; this.y = y;  this.w = w; this.h = h;
     this.complete = false; this.isOff = false;
     this.draw = function() {
+        noStroke();
         fill(0, 0, 0);
         rect(this.x, this.y + grid, this.w, 5);
         fill(255, 34, 255, 50);
@@ -1347,6 +1352,8 @@ redTrans = constrain(redTrans,0,255);
 //background(255);
 
 };
+
+
 
 
 

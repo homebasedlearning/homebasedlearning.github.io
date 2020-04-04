@@ -289,10 +289,10 @@ var levels = [
 "                   ",
 "                   ",
 "                   ",
-"                   ",
-"          b3b      ",
+"           3       ",
+"          b b      ",
 "  b       b b      ",
-"  b       b        ",
+"  b       b b      ",
 "  b       b b      A",
 "  b       b bbbbbbbb",
 "  b       bccccccccb",
@@ -1288,6 +1288,11 @@ var draw = function() {
     if (level === 10) {
         fill(0, 0, 0);
         text("Fake blocks are involved...", 258, 131);
+    }
+    if (level === 11) {
+        fill(0);
+        textSize(39);
+        text("Portals!!", 200, 393);
     }
     
     

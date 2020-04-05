@@ -43,9 +43,50 @@ https://github.com/Team-Code/KA_Offline -->
 
 
 
+/* 
+Use arrow keys to move
+
+If you have seeen this before it is most likely on my alt account where I developed this game.
+
+I made this game in less than a week so it's not perfect.
+
+I will probably be adding more levels.
+
+Don't leave tha game for too long if not oh noes will give ou an error message
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*
-This game used Jacob's "Game Template" as a base and starting point
-Huge thanks to Jacob for his "Game Template" found here:
+This game used Jacob's "Game Template" 
+Jacob's "Game Template" can be found here:
 https://www.khanacademy.org/computer-programming/game-template/4920704444923904
 */
 
@@ -54,10 +95,11 @@ var playerSize = [20,20];//the size of the player
 var pJumpHeight=8;
 var playerColor = color(255,0,0);
 var grid = 30;
+var deaths = 0;
 
 
 /* 
-Btw Jacob's less strict on credits so it's fine to take away this line as there is already the same credits above
+These levels used Jacob's Platformer Editer v1.0 for the blocks that he provided
 */
 /***********vvv ADD YOUR LEVELS HERE vvv***********/
 var levels = [
@@ -81,7 +123,7 @@ var levels = [
 "            _ _ _ _  b###    ",
 " P          ########Mb###@b  ",
 "bbbbbbbbmmbbbbbbbbbbbbbbbbAAA",
-
+"                             ",
 ],
     [
 "                   ",
@@ -101,7 +143,7 @@ var levels = [
 "   b##########b#b  ",
 "  Pd############b##",
 "bbbbbbbbbbbbbbbbbbbb",
-
+"                    ",
 ],
 [
 "                   ",
@@ -121,7 +163,7 @@ var levels = [
 "                  M#",
 " Pdb&&&&&&&b% % %bb#",
 "bbbbbbbbbbbbbbbbbbbb",
-
+"                    ",
 ],
 [
 "                   ",
@@ -141,7 +183,7 @@ var levels = [
 "##    bbbbb  b & b ",
 "##Pd   ####  b     ",
 "bbbbbbbbbbbAobbbbbbb",
-
+"                    ",
 ],
 [
 "             #bdddd",
@@ -161,7 +203,7 @@ var levels = [
 "         b####     ",
 "     A   b####ooooo",
 "bbbbbbbbbbbbbbbbbbb",
-
+"                   ",
 ],
 [
 "P_ _ _ _ _ _ _ _ _ _",
@@ -181,7 +223,7 @@ var levels = [
 "                   ",
 "AAAAAAAAAAAAAAAAAAA",
 "bbbbbbbbbbbbbbbbbbbb",
-
+"                    ",
 ],
 [
 "                   ",
@@ -201,7 +243,7 @@ var levels = [
 "  b###    b ########",
 " Pd####M  bjMMMM@MMM",
 "bbbbbbbbbbbbbbbbbbbb",
-
+"                    ",
 ],
 [
 "          b        ",
@@ -221,7 +263,7 @@ var levels = [
 "  sbdbdb###########",
 " Pd################",
 "bbbbbbbbbbbbbbbbbbbb",
-
+"                    ",
 ],
 [
 "                   ",
@@ -241,7 +283,7 @@ var levels = [
 "              Pd   ",
 "    @         mm   ",
 "mmmmmmmmmmmmmbbbmmd",
-
+"                   ",
 ],
 [
 "#                  ",
@@ -261,7 +303,7 @@ var levels = [
 "b b######M         ",
 " Pd######M         ",
 "bbbbbbbbbbbbbbbbbbb",
-
+"                   ",
 ],
 [
 "                    ",
@@ -281,7 +323,7 @@ var levels = [
 "                   @",
 "bbbbbbbbb   f   bmfb",
 "dddddddddddddddddddd",
-
+"                    ",
 ],
 [
 "                   ",
@@ -301,7 +343,7 @@ var levels = [
 "  b       bbbbbbbbbj",
 "@ bP#M  I bO       2",
 "bbbbbbbbbbbsbdbdbdbb",
-
+"                    ",
 ],
     
     ];
@@ -1240,19 +1282,21 @@ var applyGame = function(){
 updateMap();
 var cam = new Camera(player.x,player.y);
 var draw = function() {
+    var timer = floor(frameCount / 60);
     background(200);
     pushMatrix();
     cam.view(player);
     textSize(20);
     if (level === 0) {
         fill(0, 0, 0);
+        textSize(20);
         text("This is ice, \nit melts really fast.\n\t ↓", 450, 361);
         text("This is a trampoline, \nit makes you bounce.\n\t ↓", 606, 276);
         text("This is a \n spike, \ndo not touch.\n\t     ↓", 239, 315);
         text("This is lava, \ndo not touch.\n\t ↓", 100, 325);
-        textSize(16);
-        text("This is death, \ndo not touch.\n\t ↓", 280, 181);
-        text("This is a cannon, \nshoots dangerous stuff.\n\t ↓", 100, 181);
+        textSize(10);
+        text("This is death, \ndo not touch.\n\t ↓", 280, 191);
+        text("This is a cannon, \nshoots dangerous stuff.\n\t ↓", 100, 191);
         textSize(15);
         text("This block makes you \nmove in the \ndirection it is facing\n↓", 264, 443);
     }
@@ -1304,7 +1348,7 @@ var draw = function() {
         if(portals[0].complete){
             if(level<levels.length-1){level++; updateMap(); resetCam();}else{
                 background(0, 0, 0);fill(255); textSize(20); transparence = 0;
-                text("CONGRATULATIONS\nYou have finished all the levels\nin this game...\nFor now...\nI will add more lvls, mechanics \nand blocks. Maybe\n\n Credits in code",200,200);}
+                text("CONGRATULATIONS\nYou have finished all the levels\nin this game with " + deaths + " deaths...\nFor now...\nI will add more lvls, mechanics \nand blocks. Maybe\n\n Credits in code\n \n Time spent:" + timer + "s",200,200);}
                 textSize(9);
                 
         }
@@ -1341,6 +1385,18 @@ var draw = function() {
             teleporterIns2[0].isOff = false;
         }
     }
+    rect(0, 400 - grid, 400, grid);
+    if (player.dead) {
+        deaths += 1;
+    }
+    if (player.deadTimer < 100) {
+        textSize(20);
+        fill(255, 0, 0);
+        text("Deaths: " + floor(deaths / 100), 50, 385);
+    }
+    
+    text("Time spent: " + timer + "s", 320, 385);
+    fill(255, 255, 255);
     
 //@transparency
 {
@@ -1357,6 +1413,9 @@ redTrans = constrain(redTrans,0,255);
 //background(255);
 
 };
+
+
+
 
 
 

@@ -513,7 +513,6 @@ var Player = function(x,y,w,h){
     noFill();
     stroke(0);
     strokeWeight(1);
-    
     };
     this.applyCollision=function(obj,velx,vely){
     for(var i=0; i<obj.length; i++){
@@ -1360,7 +1359,7 @@ var draw = function() {
         if(portals[0].complete){
             if(level<levels.length-1){level++; updateMap(); resetCam();}else{
                 background(0, 0, 0);fill(255); textSize(20); transparence = 0;
-                text("CONGRATULATIONS\nYou have finished all the levels\nin this game with " + floor(deaths / 100) + " deaths...\nFor now...\nI will add more lvls, mechanics \nand blocks. Maybe\n\n Credits in code\n \n Time spent:" + timer + "s",200,200);}
+                text("CONGRATULATIONS\nYou have finished all the levels\nin this game with " + deaths + " deaths...\nFor now...\nI will add more lvls, mechanics \nand blocks. Maybe\n\n Credits in code\n \n Time spent:" + timer + "s",200,200);}
                 textSize(9);
                 
         }
@@ -1408,7 +1407,9 @@ var draw = function() {
     }
     
     text("Time spent: " + timer + "s", 320, 385);
+    text("Level: " + (level + 1) + "/" + (levels.length), 173, 385);
     fill(255, 255, 255);
+    
     
 //@transparency
 {
@@ -1425,6 +1426,8 @@ redTrans = constrain(redTrans,0,255);
 //background(255);
 
 };
+
+
 
 
 

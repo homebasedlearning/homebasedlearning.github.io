@@ -357,7 +357,7 @@ var levels = [
 "                   ",
 "dPd          I     ",
 "bbbbbbbMMdbbbb     ",
-"#######bbbbbbbbbbbbb",
+"#######bbbbbbbbbbbjb",
 
 ],
     
@@ -1568,7 +1568,7 @@ var draw = function() {
         fill(0);
         textSize(15);
         text("This is a fan-suggested level", 230, 410);
-        text("Level suggested by: Adriel", 230, 400 + grid);
+        text("Level suggested by: Anonymous", 230, 400 + grid);
         text("Predators stun you \nwhen you collide \nwith them", 400, 250);
         text("Predators \nstun you \nwhen you collide \nwith them", 60, 225);
     }
@@ -1582,7 +1582,7 @@ var draw = function() {
         if(portals[0].complete){
             if(level<levels.length-1){level++; updateMap(); resetCam();}else{
                 background(0, 0, 0);fill(255); textSize(20); transparence = 0;
-                text("CONGRATULATIONS\nYou have finished all the levels\nin this game with " + deaths + " deaths...\nFor now...\nI will add more lvls, mechanics \nand blocks. Maybe\n\n Credits in code\n \n Time spent:" + timer + "s",200,200);}
+                text("CONGRATULATIONS\nYou have finished all the levels\nin this game with " + floor(deaths / 100) + " deaths...\nFor now...\nI will add more lvls, mechanics \nand blocks. Maybe\n\n Credits in code\n \n Time spent:" + timer + "s",200,200);}
                 textSize(9);
                 
         }

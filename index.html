@@ -359,6 +359,26 @@ var levels = [
 "bbbbbbbbbbbsbdbdbdbb",
 "                    ",
 ],
+[
+"       dddd         ",
+"      =c c =       ",
+"           =  @    ",
+"              b    ",
+"                   ",
+"       MMMM        ",
+"    nbbbbbb        ",
+"       bccb        ",
+"    bbbb           ",
+"  f ####++= O      ",
+"ddojbbbbbbbdfddb   ",
+"     b bb          ",
+"      b++b         ",
+"                   ",
+"dPd          I     ",
+"bbbbbbbMMdbbbb     ",
+"#######bbbbbbbbbbbbb",
+
+],
     
     ];
 /******* vvv DON'T TOUCH THOSE! vvv ******/
@@ -470,10 +490,11 @@ var Player = function(x,y,w,h){
     this.fallLimit = 8; this.health = 100;
     this.dir = 0; this.color = playerColor;//art stuff
     this.dead = false; this.deadTimer = 0; 
+    this.stunned = false;
     this.update = function(blocks){
         this.sight = this.w/4;//calculate the offset of the face based on the width of the player.
         
-        if(!this.dead){//moving
+        if(!this.dead && this.stunned === false){//moving
         if(keys[UP]&&!this.falling){ this.yvel=-this.JH;}
         if(keys[RIGHT]){this.xvel+=this.speed; this.dir+=this.speed;}
         if(keys[LEFT]){ this.xvel-=this.speed; this.dir-=this.speed;} 
@@ -501,6 +522,7 @@ var Player = function(x,y,w,h){
         if(this.dead){
             this.deadTimer++;
         }
+        
     };
     this.draw = function() {
         noStroke();
@@ -515,12 +537,14 @@ var Player = function(x,y,w,h){
     noFill();
     stroke(0);
     strokeWeight(1);
+    
     };
     this.applyCollision=function(obj,velx,vely){
     for(var i=0; i<obj.length; i++){
         if(collide(this,obj[i])&&obj[i].solid){ // handle collisions
             if(obj[i].type==="ice"){obj[i].melting = true;}//make the ice blocks start melting
             if(obj[i].type==="fakeBlk"){obj[i].melting = true;}
+            if(obj[i].type==="switchBlocks"){obj[i].melting = true;}
             if(vely>0){ this.yvel=0; this.falling=false; this.y=obj[i].y-this.h; }
             if(vely<0){ this.yvel=0; this.falling=true; this.y=obj[i].y+obj[i].h; }
             if(velx<0){ this.xvel=0; this.x=obj[i].x+obj[i].w; }
@@ -602,6 +626,9 @@ var Block = function(x,y,w,h,type,i){
                     noStroke(); fill(this.r, this.g, this.b, this.op);
                     rect(this.x, this.y, this.w, this.h);
                 break;
+                case "mobBlk":
+                    noStroke(); fill(200, 200, 200);
+                    rect(this.x, this.y, this.w, this.h);
             }
         }
     };
@@ -690,6 +717,9 @@ var Block = function(x,y,w,h,type,i){
                 this.r = 163; this.g = 163; this.b = 163;
             }
             
+        }
+        if(this.type === "mobBlk") {
+            this.solid = false;
         }
         
         
@@ -919,6 +949,86 @@ DeathBlock.apply = function(){
         this[i].draw();
         this[i].update();
     }};
+    
+var Switch = function(x, y, type) {
+    this.x = x;this.y = y; this.h = grid / 5 * 3; this.w = this.h;
+    this.redOpen = false; this.blueOpen = false;
+    this.draw = function() {
+        if(view(this)){
+            switch(this.type){
+                case "red":
+                    fill(0);
+                    rect(this.x, this.y, this.w, this.h);
+                    fill(255);
+                    ellipse(this.x, this.y, this.w / 2 * 3, this.h / 2 * 3);
+                break;
+                case "blue":
+                    fill(0);
+                    rect(this.x, this.y, this.w, this.h);
+                    fill(0, 0, 255);
+                    ellipse(this.x, this.y, this.w / 2 * 3, this.h / 2 * 3);
+                break;
+            }
+        }
+    };
+    this.update = function() {
+        if (this.type === "red") {
+            if(collide(this, player)) {
+                this.redOpen = true;
+            }
+        }
+        if (this.type === "blue") {
+            if(collide(this, player)) {
+                this.blueOpen = true;
+            }
+        }
+    };
+};
+var switches = [];
+switches.add = function(x,y,s){ this.push(new Switch(x,y,s)); };
+switches.apply = function(){
+    for(var i=0;i<this.length;i++){
+        this[i].draw();
+        this[i].update();
+    }};
+    
+var SwitchBlock = function(x, y, w, h, type) {
+    this.x = x; this.y = y; this.w = w; this.h = h;
+    this.melting = false; this.solid = true;
+    this.redStart = false; this.blueStart = false;
+    this.draw = function() {
+        if(view(this)){
+            switch(this.type){
+                case "red":
+                    fill(255, 0, 0, 100);
+                    fill(0, 0, 0);
+                    rect(this.x, this.y, this.w, this.h);
+                break;
+                case "blue":
+                    fill(0, 0, 255, 100);
+                    rect(this.x, this.y, this.w, this.h);
+                break;
+            }
+        }
+    };
+    this.update = function() {
+        if(this.type === "red") {
+            this.redStart = true;
+        }
+        if(this.type === "blue") {
+            this.blueStart = true;
+        }
+        
+    };
+};
+var switchBlocks = [];
+switchBlocks.add = function(x,y,w,h,type){ this.push(new SwitchBlock(x,y,w,h,type)); };
+switchBlocks.apply = function(){
+    for(var i=0;i<this.length;i++){
+        this[i].draw();
+        this[i].update();
+    }
+};
 //@ghostBlock
 var ghostBlock = function(x,y,s,i){
     this.x=x; this.y=y; this.w=s; this.h=s;
@@ -1140,6 +1250,115 @@ monsters.apply=function(){
         if(this[i].dead){this.splice(i,1);}
     }
 };
+
+
+
+
+
+
+
+var Predator=function(x,y,w,h){
+    this.x=x; this.y=y; this.w=w; this.h=h;
+    this.dead=false; // is the predator "dead"?
+    this.xvel=1; //predator's speed
+    this.angle=0; // the predator's eye's angle
+    this.stunTimer = 0;
+    this.stunTimerStart = false;
+this.draw= function() {
+    if(view(this)&&!this.dead){
+        // draw the predator
+        fill(255, 110, 110, 100);
+        noStroke();
+        rect(this.x,this.y,this.w,this.h); // main body
+        
+        if (this.xvel > 0) {
+            fill(135, 19, 19);
+            triangle(this.x + this.w, this.y + (this.h / 4), this.x + (this.w / 2), this.y + (this.h / 2), this.x + this.w, this.y + (this.h / 4 * 3));
+        }
+        if (this.xvel < 0) {
+            fill(135, 19, 19);
+            triangle(this.x, this.y + (this.h / 4), this.x + (this.w / 2), this.y + (this.h / 2), this.x, this.y + (this.h / 4 * 3));
+        }
+        
+        
+        /*
+        fill(255, 255, 255);
+        stroke(0);
+        ellipse(this.x+this.w/2,this.y+this.h/2,this.w/2,this.h/2); // the white of the eye
+        // the pupil
+        pushMatrix();
+        translate(this.x+this.w/2,this.y+this.h/2);
+        rotate(this.angle+40);
+        fill(0, 0, 0);
+        ellipseMode(CORNER);
+        ellipse(0,0,this.w/5,this.h/5);
+        ellipseMode(CENTER);
+        popMatrix();
+        */
+    }
+};
+this.update = function(){
+    if(!this.dead){
+        this.angle = atan2(this.x-player.x,player.y-this.y);//make the angle point to the player
+        this.x+=this.xvel;
+        for(var i=0;i<blocks.length;i++){
+            if(collide(this, blocks[i])){
+                this.xvel=-this.xvel;
+            }
+        }
+        for(var i=0;i<lava.length;i++){
+            if(collide(this, lava[i])){
+                this.xvel=-this.xvel;
+            }
+        }
+        if(collide(this, player)){
+            if(!player.falling&&!this.dead&&!player.dead){
+                    this.stunTimerStart = true;
+                    redTrans = 80;
+            }else if(player.yvel>0&&player.falling){
+                    this.dead=true; // the predator is "dead"
+                    player.yvel=-player.JH; // make the player hop 
+                    
+            }
+        }
+    }
+        if(this.stunTimerStart === true) {
+                this.stunTimer++;
+        }
+        if(this.stunTimer > 0 && this.stunTimer <= 180) {
+                player.stunned = true;
+        }
+        if(this.stunTimer > 180 || this.stunTimer ===0) {
+                this.stunTimerStart = false;
+                this.stunTimer = 0;
+                player.stunned = false;
+                
+                    
+        }
+        
+    
+    
+};
+
+};
+var predators=[];
+predators.add=function(x,y,w,h){ this.push(new Predator(x,y,w,h)); };
+predators.apply=function(){
+    for(var i=0; i<this.length; i++){
+        this[i].update();
+        this[i].draw();
+        if(this[i].dead){this.splice(i,1);}
+    }
+};
+
+
+
+
+
+
+
+
+
 var moveCannon = function(x,y,w,h){
     this.x=x; this.y=y; this.w=w; this.h=h;
     this.angle = atan2(this.x-player.x,player.y-this.y);
@@ -1196,7 +1415,7 @@ moveCannons.apply = function(){
 };
     
 //manage the objects in the game
-var objects = [blocks,portals,lava,spikes,jumpBlocks,cannons,bullets, monsters, DeathBlock, GhostBlock, moveCannons, teleporterIns, teleporterOuts, teleporterIns2, teleporterOuts2];
+var objects = [blocks,portals,lava,spikes,jumpBlocks,cannons,bullets, monsters, DeathBlock, GhostBlock, moveCannons, teleporterIns, teleporterOuts, teleporterIns2, teleporterOuts2, switches, switchBlocks, predators];
 objects.remove = function(){
     for (var i = 0; i < objects.length; i++) {
         for (var j = 0; j < objects[i].length; j++) {
@@ -1257,6 +1476,18 @@ var updateMap = function(){
                     break;
                 case "3": teleporterOuts2.add(row * grid, col * grid, grid, grid);
                     break;
+                case "R": switches.add(row * grid, col * grid, "red");
+                    break;
+                case "B": switches.add(row * grid, col * grid, "blue");
+                    break;
+                case "r": switchBlocks.add(row * grid, col * grid, grid, grid, "red");
+                    break;
+                case "S": switchBlocks.add(row * grid, col * grid, grid, grid, "blue");
+                    break;
+                case "+": predators.add(row*grid,col*grid,grid,grid);
+                    break;
+                case "=": blocks.add(row * grid, col * grid, grid, grid, "mobBlk");
+                    break;
             }
             level_w = levels[level][col].length * grid;
             level_h = levels[level].length * grid;
@@ -1285,6 +1516,7 @@ var applyGame = function(){
     teleporterOuts.apply();
     teleporterIns2.apply();
     teleporterOuts2.apply();
+    predators.apply();
     player.update(blocks);
     
     
@@ -1351,6 +1583,14 @@ var draw = function() {
         textSize(39);
         text("Portals!!", 200, 393);
     }
+    if(level === 12) {
+        fill(0);
+        textSize(15);
+        text("This is a fan-suggested level", 230, 410);
+        text("Level suggested by: Adriel", 230, 400 + grid);
+        text("Predators stun you \nwhen you collide \nwith them", 400, 250);
+        text("Predators \nstun you \nwhen you collide \nwith them", 60, 225);
+    }
     
     
     applyGame();
@@ -1398,6 +1638,25 @@ var draw = function() {
             teleporterIns2[0].isOff = false;
         }
     }
+    for (var i = 0; i < switches.length; i++) {
+        for (var j = 0; j < switchBlocks.length; j++) {
+            if (switches[i].blueOpen === true) {
+                if (switchBlocks[j].type === "blue") {
+                    switchBlocks[j].melting = true;
+                    switchBlocks[j].solid = false;
+                }
+            }
+            if (switches[i].redOpen === true) {
+                if (switchBlocks[j].type === "red") {
+                    switchBlocks[j].melting = true;
+                    switchBlocks[j].solid = false;
+                }
+            }
+        }
+    }
+    
+        
+    
     rect(0, 400 - grid, 400, grid);
     if (player.dead) {
         deaths += 1;
@@ -1428,6 +1687,7 @@ redTrans = constrain(redTrans,0,255);
 //background(255);
 
 };
+
 
 
 

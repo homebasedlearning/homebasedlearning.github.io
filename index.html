@@ -56,7 +56,6 @@ https://github.com/Team-Code/KA_Offline -->
 
 
 
-
 /* 
 Use arrow keys to move
 
@@ -110,7 +109,7 @@ var pJumpHeight=8;
 var playerColor = color(255,0,0);
 var grid = 30;
 var deaths = 0;
-
+var eeTextEnabled = false;
 
 /* 
 These levels used Jacob's Platformer Editer v1.0 for the blocks that he provided
@@ -354,8 +353,8 @@ var levels = [
 "  b       bccccccccb",
 "  b       b        ",
 "  b       bM       ",
-"  b       bbbbbbbbbj",
-"@ bP#M  I bO       2",
+"P b       bbbbbbbbbj",
+"@ bA#M  I bO       2",
 "bbbbbbbbbbbsbdbdbdbb",
 "                    ",
 ],
@@ -376,7 +375,7 @@ var levels = [
 "                   ",
 "dPd          I     ",
 "bbbbbbbMMdbbbb     ",
-"#######bbbbbbbbbbbjb",
+"#######bbbbbbbbbbo~m",
 ],
     
     ];
@@ -517,6 +516,7 @@ var Player = function(x,y,w,h){
         
         if(this.health<=0){
             this.dead = true;
+            eeTextEnabled = false;
         }
         if(this.dead){
             this.deadTimer++;
@@ -613,6 +613,10 @@ var Block = function(x,y,w,h,type,i){
                     noStroke(); fill(68, 255, 51);
                     rect(this.x, this.y, this.w, this.h);
                 break;
+                case "easterEggJumpy":
+                    noStroke(); fill(68, 255, 51);
+                    rect(this.x, this.y, this.w, this.h);
+                break;
                 case "gravity":
                     noStroke(); fill(255, 119, 0);
                     rect(this.x, this.y, this.w, this.h);
@@ -689,6 +693,12 @@ var Block = function(x,y,w,h,type,i){
         if (this.type === "jumpy") {
             if (player.x <= this.x + this.w && player.x >= this.x - (this.w / 2) && player.y <= this.y && (player.y + playerSize[1]) >= this.y) {
                 player.gravity = 0.15;
+            }    
+        }
+        if (this.type === "easterEggJumpy") {
+            if (player.x <= this.x + this.w && player.x >= this.x - (this.w / 2) && player.y <= this.y && (player.y + playerSize[1]) >= this.y) {
+                player.gravity = 0.15;
+                
             }    
         }
         if (this.type === "gravity") {
@@ -1487,6 +1497,8 @@ var updateMap = function(){
                     break;
                 case "=": blocks.add(row * grid, col * grid, grid, grid, "mobBlk");
                     break;
+                case "~": blocks.add(row * grid, col * grid, grid, grid, "easterEggJumpy");
+                    break;
             }
             level_w = levels[level][col].length * grid;
             level_h = levels[level].length * grid;
@@ -1598,11 +1610,11 @@ var draw = function() {
     if(player.deadTimer>100){updateMap(); resetCam();}
     if(portals[0]){
         if(portals[0].complete){
-            if(level<levels.length-1){level++; updateMap(); resetCam();}else{
+            if(level<levels.length-1){level++; updateMap(); resetCam(); eeTextEnabled = false;}else{
                 background(0, 0, 0);fill(255); textSize(20); transparence = 0;
                 text("CONGRATULATIONS\nYou have finished all the levels\nin this game with " + floor(deaths / 100) + " deaths...\nFor now...\nI will add more lvls, mechanics \nand blocks. Maybe\n\n Credits in code\n \n Time spent:" + timer + "s",200,200);}
                 textSize(9);
-                
+                eeTextEnabled = false;
         }
     }
     if (teleporterIns[0] && teleporterOuts[0]) {
@@ -1653,8 +1665,20 @@ var draw = function() {
             }
         }
     }
-    
-        
+    for(var i =0; i < blocks.length; i++) {
+        if (blocks[i].type === "easterEggJumpy") {
+            if (player.x <= blocks[i].x + blocks[i].w && player.x >= blocks[i].x - (blocks[i].w / 2) && player.y <= blocks[i].y && (player.y + playerSize[1]) >= blocks[i].y) {
+                eeTextEnabled = true;
+                    
+            }    
+        }
+    }
+    if (eeTextEnabled) {
+        textSize(30);
+        fill(255);
+        text("Pls keep the \n easter egg a \n secret", 200, 200);
+        fill(0);
+    }
     
     rect(0, 400 - grid, 400, grid);
     if (player.dead) {
@@ -1686,6 +1710,7 @@ redTrans = constrain(redTrans,0,255);
 //background(255);
 
 };
+
 
 
 

@@ -103,18 +103,23 @@ Jacob's "Game Template" can be found here:
 https://www.khanacademy.org/computer-programming/game-template/4920704444923904
 */
 
-
+//Some variables 
+{
 var playerSize = [20,20];//the size of the player
 var pJumpHeight=8;
 var playerColor = color(255,0,0);
 var grid = 30;
 var deaths = 0;
 var eeTextEnabled = false;
-
+var currentScene = 1;
+}
 /* 
 These levels used Jacob's Platformer Editer v1.0 for the blocks that he provided
 */
 /***********vvv ADD YOUR LEVELS HERE vvv***********/
+var gamePlay = false;
+var charStart = false;
+var startStart = false;
 var levels = [
     //Replace this with the code for your level.
     //You can add as many as you want. just put them one after the other.
@@ -353,8 +358,8 @@ var levels = [
 "  b       bccccccccb",
 "  b       b        ",
 "  b       bM       ",
-"P b       bbbbbbbbbj",
-"@ bA#M  I bO       2",
+"  b       bbbbbbbbbj",
+"@ bP#M  I bO       2",
 "bbbbbbbbbbbsbdbdbdbb",
 "                    ",
 ],
@@ -478,6 +483,30 @@ var collide=function(obj1,obj2){
     obj1.y<obj2.y+obj2.h&&obj1.y+obj1.h>obj2.y;
 };
 
+var Button = function(x, y, w, h, label, size) {
+    this.x = x; this.y = y; this.w = w; this.h = h;
+    this.label = label;
+    this.size = size;
+};
+
+Button.prototype.draw = function() {
+    
+    noStroke();
+    fill(138, 138, 138);
+    rectMode(CENTER);
+    textAlign(CENTER);
+    rect(this.x, this.y, this.w, this.h, 5);
+    fill(0, 0, 0);
+    textSize(this.size);
+    text(this.label, this.x, this.y);
+    rectMode(CORNER);
+};
+
+var button = [];
+button.add = function(x, y, w, h, label) {this.push(new Button(x, y, w, h, label));};
+
+
+
 var Player = function(x,y,w,h){
     this.x=x; this.y=y;
     this.w=w; this.h=h; 
@@ -536,7 +565,6 @@ var Player = function(x,y,w,h){
     noFill();
     stroke(0);
     strokeWeight(1);
-    
     };
     this.applyCollision=function(obj,velx,vely){
     for(var i=0; i<obj.length; i++){
@@ -564,6 +592,56 @@ this.healthBar = function(){
 };
 };
 var player = new Player(200,100,playerSize[0],playerSize[1]);
+
+/*
+var Characters = function(x, y, w, h, design) {
+    this.design = design;
+    this.color = playerColor;
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+};
+Characters.prototype.draw = function() {
+    if(this.design === "classic") {
+        noStroke();
+        var d = (this.dir/this.w)*15;
+        fill(this.color);
+        rect(this.x,this.y,this.w,this.h,(this.w+this.h)/20);
+        this.eyeSize = (this.w+this.h)/10;
+        fill(0);
+        ellipse(d+this.x+this.w/3,this.y+this.h/3,this.eyeSize,this.eyeSize);
+        ellipse(d+this.x+this.w*2/3,this.y+this.h/3,this.eyeSize,this.eyeSize);
+    
+        noFill();
+        stroke(0);
+        strokeWeight(1);
+        arc(d+this.x+this.w/2,this.y,this.w,this.h*1.5,70,110);
+    }
+    if(this.design === "rainbow") {
+        noStroke();
+        var d = (this.dir/this.w)*15;
+        for (var i = 0; i < 10; i++) {
+            playerColor = color(i * 10, 0, 0);
+        }
+        fill(this.color);
+        rect(this.x,this.y,this.w,this.h,(this.w+this.h)/20);
+        this.eyeSize = (this.w+this.h)/10;
+        fill(0);
+        ellipse(d+this.x+this.w/3,this.y+this.h/3,this.eyeSize,this.eyeSize);
+        ellipse(d+this.x+this.w*2/3,this.y+this.h/3,this.eyeSize,this.eyeSize);
+    
+        noFill();
+        stroke(0);
+        strokeWeight(1);
+        arc(d+this.x+this.w/2,this.y,this.w,this.h*1.5,70,110);
+    }
+};
+var characters = [];
+characters.add = function(x, y, w, h, design) {this.push(new Character(x, y, w, h, design));};
+*/
+
+
 
 //@blocks
 var Block = function(x,y,w,h,type,i){
@@ -800,6 +878,7 @@ teleporterOuts.apply = function(){
         this[i].update();
     }
 };
+
 
 var TeleporterIn2 = function(x, y, w, h) {
     this.x = x; this.y = y;  this.w = w; this.h = h;
@@ -1533,11 +1612,221 @@ var applyGame = function(){
     
 };
     
+var startButton = new Button(200, 100, 200, 100, "Start", 30);
+var charButton = new Button(200, 300, 200, 100, "Choose \nCharacter", 30);
+var backButton = new Button(30, height - 15, 50, 25, "Go Back", 10);
+//var rainbowC = new Character(100, 200, player.w, player.h, "rainbow");
+
+var drawGameScene = function() {
+    currentScene = 3;
+    var timer = floor(frameCount / 60);
+    background(200);
+    pushMatrix();
+    cam.view(player);
+    textSize(20);
+    if (level === 0) {
+        fill(0, 0, 0);
+        textSize(20);
+        text("This is ice, \nit melts really fast.\n\t ↓", 450, 361 - grid);
+        text("This is a trampoline, \nit makes you bounce.\n\t ↓", 606, 276 - grid);
+        text("This is a \n spike, \ndo not touch.\n\t     ↓", 239, 315 - grid);
+        text("This is lava, \ndo not touch.\n\t ↓", 100, 325 - grid);
+        textSize(10);
+        text("This is death, \ndo not touch.\n\t ↓", 280, 215 - grid);
+        text("This is a cannon, \nshoots dangerous stuff.\n\t ↓", 100, 217 - grid);
+        textSize(15);
+        text("This block makes you \nmove in the \ndirection it is facing\n↓", 264, 443 - grid);
+    }
+    if(level === 3) {
+        fill(0, 0, 0);
+        textSize(15);
+        text("Sometimes \nyou\n just have to \nrisk it...", 107, 416 - grid);
+        textSize(26);
+        textSize(15);
+        fill(150, 150, 150);
+        text("Dash!!", 182, 497 - grid);
+    }
+    if (level === 6) {
+        fill(140, 127, 51);
+        text("Yellow honey blocks \nsimulate \nsun gravity", 105, 296 - grid);
+        fill(13, 97, 4);
+        text("Green jump boost blocks \nsimulate \nmoon gravity", 152, 200 - grid);
+    }
+    if (level === 7) {
+        fill(0, 0, 0);
+        text("More gravity\n blocks added", 188, 372 - grid);
+    }
+    if (level === 8) {
+        fill(0, 0, 0);
+        text("Free level!!!", 470, 372 - grid);
+    }
+    if (level === 9) {
+        fill(0, 0, 0);
+        text("Yay! \nI made \nmoving cannons!", 136, 248 - grid);
+    }
+    if (level === 10) {
+        fill(0, 0, 0);
+        text("Fake blocks are involved...", 258, 131 - grid);
+    }
+    if (level === 11) {
+        fill(0);
+        textSize(39);
+        text("Portals!!", 200, 393 - grid);
+    }
+    if(level === 12) {
+        fill(0);
+        textSize(15);
+        text("This is a fan-suggested level", 230, 410);
+        text("Level suggested by: Anonymous", 230, 400 + grid);
+        text("Predators stun you \nwhen you collide \nwith them", 400, 250 - grid);
+        text("Predators \nstun you \nwhen you collide \nwith them", 60, 225 - grid);
+    }
+    
+    
+    applyGame();
+    popMatrix();
+    player.healthBar();
+    if(player.deadTimer>100){updateMap(); resetCam();}
+    if(portals[0]){
+        if(portals[0].complete){
+            if(level<levels.length-1){level++; updateMap(); resetCam(); eeTextEnabled = false;}else{
+                background(0, 0, 0);fill(255); textSize(20); transparence = 0;
+                text("CONGRATULATIONS\nYou have finished all the levels\nin this game with " + floor(deaths / 100) + " deaths...\nFor now...\nI will add more lvls, mechanics \nand blocks. Maybe\n\n Credits in code\n \n Time spent:" + timer + "s",200,200);}
+                textSize(9);
+                eeTextEnabled = false;
+        }
+    }
+    if (teleporterIns[0] && teleporterOuts[0]) {
+        if (teleporterIns[0].complete === true) {
+            teleporterIns[0].complete = false;
+            player.x = teleporterOuts[0].x;
+            player.y = teleporterOuts[0].y;
+            
+            teleporterOuts[0].isOff = false;
+        }
+        if (teleporterOuts[0].complete === true) {
+            teleporterOuts[0].complete = false;
+            player.x = teleporterIns[0].x;
+            player.y = teleporterIns[0].y;
+            
+            teleporterIns[0].isOff = false;
+        }
+    }
+    if (teleporterIns2[0] && teleporterOuts2[0]) {
+        if (teleporterIns2[0].complete === true) {
+            teleporterIns2[0].complete = false;
+            player.x = teleporterOuts2[0].x;
+            player.y = teleporterOuts2[0].y;
+            
+            teleporterOuts2[0].isOff = false;
+        }
+        if (teleporterOuts2[0].complete === true) {
+            teleporterOuts2[0].complete = false;
+            player.x = teleporterIns2[0].x;
+            player.y = teleporterIns2[0].y;
+            
+            teleporterIns2[0].isOff = false;
+        }
+    }
+    for (var i = 0; i < switches.length; i++) {
+        for (var j = 0; j < switchBlocks.length; j++) {
+            if (switches[i].blueOpen === true) {
+                if (switchBlocks[j].type === "blue") {
+                    switchBlocks[j].melting = true;
+                    switchBlocks[j].solid = false;
+                }
+            }
+            if (switches[i].redOpen === true) {
+                if (switchBlocks[j].type === "red") {
+                    switchBlocks[j].melting = true;
+                    switchBlocks[j].solid = false;
+                }
+            }
+        }
+    }
+    for(var i =0; i < blocks.length; i++) {
+        if (blocks[i].type === "easterEggJumpy") {
+            if (player.x <= blocks[i].x + blocks[i].w && player.x >= blocks[i].x - (blocks[i].w / 2) && player.y <= blocks[i].y && (player.y + playerSize[1]) >= blocks[i].y) {
+                eeTextEnabled = true;
+                    
+            }    
+        }
+    }
+    if (eeTextEnabled) {
+        textSize(30);
+        fill(255);
+        text("Pls keep the \n easter egg a \n secret", 200, 200);
+        fill(0);
+    }
+    
+    rect(0, 400 - grid, 400, grid);
+    if (player.dead) {
+        deaths += 1;
+    }
+    if (player.deadTimer < 100) {
+        textSize(20);
+        fill(255, 0, 0);
+        text("Deaths: " + floor(deaths / 100), 50, 385);
+    }
+    
+    text("Time spent: " + timer + "s", 320, 385);
+    text("Level: " + (level + 1) + "/" + (levels.length), 173, 385);
+    fill(255, 255, 255);
+    
+    
+    //@transparency
+    {
+    fill(255,255,255,transparence);
+    noStroke();
+    rect(0,0,width,height);
+    fill(255,0,0,redTrans);
+    rect(0,0,width,height);
+    transparence -=3;
+    redTrans-=3;
+    transparence=constrain(transparence,0,255);
+    redTrans = constrain(redTrans,0,255);
+    }
+    //background(255);
+
+};
+
+var drawStartScene = function() {
+    currentScene = 1;
+    background(200, 200, 200);
+    startButton.draw();
+    charButton.draw();
+};
+
+var drawCharScene = function() {
+    currentScene = 2;
+    background(200, 200, 200);
+    for(var i = 0; i < 3; i++) {
+        for(var j = 0; j < 3; j++) {
+            fill(255);
+            rect(i * 130 + 20, j * 130 + 20, 100, 100);
+            
+        }
+    }
+    fill(255, 0, 0);
+    text("Coming soon! \nI'm so frustrated with this, \nnothing works!", 200, 200);
+    //rainbowC.draw(157, 200, player.w, player.h, "rainbow");
+    backButton.draw();
+};
+
+
+
+
+
+
+
+
 
 
 updateMap();
 var cam = new Camera(player.x,player.y);
 var draw = function() {
+    drawStartScene();
+    /*
     var timer = floor(frameCount / 60);
     background(200);
     pushMatrix();
@@ -1708,8 +1997,42 @@ transparence=constrain(transparence,0,255);
 redTrans = constrain(redTrans,0,255);
 }
 //background(255);
+*/
 
+    mouseClicked = function() {
+        if(currentScene === 1) {
+            if(mouseX > (startButton.x - startButton.w / 2) && mouseX < (startButton.x + startButton.w / 2) && mouseY > (startButton.y - startButton.h / 2) && mouseY < (startButton.y + startButton.h / 2)) {
+                gamePlay = true;
+            }
+            if(mouseX > (charButton.x - charButton.w / 2) && mouseX < (charButton.x + charButton.w / 2) && mouseY > (charButton.y - charButton.h / 2) && mouseY < (charButton.y + charButton.h / 2)) {
+                charStart = true;
+            }
+        
+        }
+        if(currentScene === 2) {
+            if(mouseX > (backButton.x - backButton.w / 2) && mouseX < (backButton.x + backButton.w / 2) && mouseY > (backButton.y - backButton.h / 2) && mouseY < (backButton.y + backButton.h / 2)) {
+                startStart = true;
+            }
+            
+        }
+        
+    };
+
+
+    if (gamePlay === true) {
+        drawGameScene();
+    }
+    if (charStart === true) {
+        drawCharScene();
+    }
+    if (startStart === true) {
+        drawStartScene();
+        startStart = false;
+        charStart = false;
+        gamePlay = false;
+    }
 };
+
 
 
 

@@ -413,6 +413,67 @@ var levels = [
 "bbbbbbbMMdbbbb     ",
 "#######bbbbbbbbbbo~m",
 ],
+[
+"d###########dbbbbbbbb     ",
+"             bbbbbbbb     ",
+"             b     bb    %",
+"             b   @ bb    ",
+"   MM MM MM  b bbbbbb  M ",
+"   MM MM MM Pb         M%",
+"  bbbbbbbbbbbbffffffff   ",
+"             b########   M",
+"_ _ _ _ _ _  b  M M  M M %",
+"AAAAAAAAAAA  b     M     ",
+"bbbbbbbbbbb  b M  M  M  M",
+"%&&&%&&&%    b   M     ###",
+"##           bM    M   ###",
+"M    M  M    bAAAAAAA   ##",
+"  bbbbbbbbbbbbbbbbbbbb   #",
+"   %   %   %   %   %     ",
+"           M     M       ",
+"MM AAM  MA MAAM A  MAM MMM",
+"bbbbbbbbbbbbbbbbbbbbbbbbbb",
+
+],
+[
+    
+"             bbbbbb% %b`````b bbbb",
+"                            b% b @",
+"                            b_ bMbb",
+"                 b   &bbbbb b  &  b",
+"                 b &  b   & b &   b",
+"                 b   &b bbbbb     b",
+"                 b &  b%   %b   _ b",
+"###bbbbbbb####bbbb    b &   b     b",
+"                 b  & b  &  b     b",
+"  M    A      AA b&   b   & b _   b",
+"   #  MAA    AAA b  & b  &  b     b",
+"     # AAA  AAAA b    b &   b   _ b",
+"       AA     AA b   &b&    b     b",
+"       A      AA b    b &   b_    b",
+"     M AAAA    A b &  b  &  b     b",
+"    #  A  A   AA b&   b   & b   _ b",
+" M     A      AA b    b    &b     b",
+"  #    AA    AAA M    b   & b_    b",
+"      MAAA  AAAA      b  &  b#    b",
+"     # AAA  AAAA     Mb &###bb _  b",
+" M   M A      AA  M   b& AAAbA    b",
+"       A      AA      b  AAAbAM   b",
+" M     AAAA  AAA     Mb    b b    b",
+"  #    AAA  AAAA%     b   Mb b M  b",
+"       A       AbAMAMAbbb  bbbbbb b",
+"       AAAA    Ab     b b  b      ",
+"       AAAA    Ab     b b  b     M",
+" %%%  MAAAA      MAMAMbAAM b      ",
+" %%%   AAAA           AAA  b MM   ",
+" %P%   AAAA      AMAMAAAAM   MM  M",
+"bbbbbbbbbbbbb##bbbbbbbbbbbbbbbbbbb ",
+"             %                    ",
+"             A                    ",
+"             AA  A                ",
+"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+
+],
     
     ];
 /******* vvv DON'T TOUCH THOSE! vvv ******/
@@ -596,6 +657,7 @@ var Player = function(x,y,w,h){
     noFill();
     stroke(0);
     strokeWeight(1);
+    arc(d+this.x+this.w/2,this.y,this.w,this.h*1.5,70,110);
     };
     this.applyCollision=function(obj,velx,vely){
     for(var i=0; i<obj.length; i++){
@@ -741,6 +803,11 @@ var Block = function(x,y,w,h,type,i){
                 case "mobBlk":
                     noStroke(); fill(200, 200, 200);
                     rect(this.x, this.y, this.w, this.h);
+                break;
+                case "easterEgg":
+                    noStroke(); fill(163, 163, 163);
+                    rect(this.x, this.y, this.w, this.h);
+                break;
             }
         }
     };
@@ -1277,6 +1344,7 @@ bullets.apply = function(){
         }
     }
 };
+
 var Cannon = function(x,y,w,h){
     this.x=x; this.y=y; this.w=w; this.h=h;
     this.angle = atan2(this.x-player.x,player.y-this.y);
@@ -1609,6 +1677,8 @@ var updateMap = function(){
                     break;
                 case "~": blocks.add(row * grid, col * grid, grid, grid, "easterEggJumpy");
                     break;
+                case "`": blocks.add(row * grid, col * grid, grid, grid, "easterEgg");
+                    break;
             }
             level_w = levels[level][col].length * grid;
             level_h = levels[level].length * grid;
@@ -1777,6 +1847,14 @@ var drawGameScene = function() {
     }
     for(var i =0; i < blocks.length; i++) {
         if (blocks[i].type === "easterEggJumpy") {
+            if (player.x <= blocks[i].x + blocks[i].w && player.x >= blocks[i].x - (blocks[i].w / 2) && player.y <= blocks[i].y && (player.y + playerSize[1]) >= blocks[i].y) {
+                eeTextEnabled = true;
+                    
+            }    
+        }
+    }
+    for(var i =0; i < blocks.length; i++) {
+        if (blocks[i].type === "easterEgg") {
             if (player.x <= blocks[i].x + blocks[i].w && player.x >= blocks[i].x - (blocks[i].w / 2) && player.y <= blocks[i].y && (player.y + playerSize[1]) >= blocks[i].y) {
                 eeTextEnabled = true;
                     
@@ -2063,6 +2141,7 @@ redTrans = constrain(redTrans,0,255);
         gamePlay = false;
     }
 };
+
 
 
 
